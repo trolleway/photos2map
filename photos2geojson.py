@@ -4,6 +4,7 @@
 import os, sys
 import exiftool
 import json
+from geojson import Feature, Point, FeatureCollection, dump 
 from fractions import Fraction
 
 
@@ -53,11 +54,7 @@ if __name__ == '__main__':
             file_list += [os.path.join(root, name)  ]
 
     
-    
-    fs = open(geojson_path,'w')
-    fs.write(geojsonHeader+"\n")
-    fs.close()
-    fs = open(geojson_path,'a')
+    geojson_features = []
 
     index = 0
     IterationStep = 200
@@ -71,19 +68,23 @@ if __name__ == '__main__':
                 #print dict
                 geojsonString='{ "type": "Feature", "properties": { "filename": "%(SourceFile)s", "datetime": "%(EXIF:DateTimeOriginal)s" }, "geometry": { "type": "Point", "coordinates": [ %(EXIF:GPSLongitude)s, %(EXIF:GPSLatitude)s ] } }, '
                 exportString = geojsonString % {"SourceFile" : record['SourceFile'],'EXIF:DateTimeOriginal' : _get_if_exist(record,'EXIF:DateTimeOriginal'),"EXIF:GPSLatitude" : _get_if_exist(record,'EXIF:GPSLatitude'),"EXIF:GPSLongitude" : _get_if_exist(record,'EXIF:GPSLongitude')}
+                new_point = Point((_get_if_exist(record,'EXIF:GPSLongitude'), _get_if_exist(record,'EXIF:GPSLatitude')))
+                
                 
                 if _get_if_exist(record,'EXIF:GPSLatitude') and _get_if_exist(record,'EXIF:GPSLongitude'):
-                    fs.write(exportString+"\n")
+
+                    geojson_features.append(Feature(geometry=new_point, properties={'filename': record['SourceFile'],'datetime': _get_if_exist(record,'EXIF:DateTimeOriginal')}) )
                 
         
         index = index+IterationStep
         if index > total:
             index=total
         progress(index, len(file_list), status='Create geojson with photo locations, total = '+str(total))
-        
-    fs = open(geojson_path,'a')
-    fs.write(geojsonFooter+"\n")
-    fs.close()
+    
+    feature_collection = FeatureCollection(geojson_features)
+    with open(geojson_path, 'w') as f:
+        dump(feature_collection, f)
+
 
 
        
