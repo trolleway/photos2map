@@ -22,7 +22,7 @@ def progress(count, total, status=''):
 
 def get_args():
     import argparse
-    p = argparse.ArgumentParser(description='Move images to folder with his date')
+    p = argparse.ArgumentParser(description='Generate geojson file with location of photos in folder')
     p.add_argument('path', help='Path to folder containing JPG files')
     return p.parse_args()
     
@@ -47,8 +47,8 @@ geojsonFooter='''
 
 if __name__ == '__main__':
     args = get_args()
-
-
+    
+    geojson_path = 'photos.geojson'
 
 
     file_list = []
@@ -58,10 +58,10 @@ if __name__ == '__main__':
 
     
     
-    fs = open('photos.geojson','w')
+    fs = open(geojson_path,'w')
     fs.write(geojsonHeader+"\n")
     fs.close()
-    fs = open('photos.geojson','a')
+    fs = open(geojson_path,'a')
 
     index = 0
     IterationStep = 200
@@ -85,33 +85,9 @@ if __name__ == '__main__':
             index=total
         progress(index, len(file_list), status='Create geojson with photo locations, total = '+str(total))
         
-    fs = open('photos.geojson','a')
+    fs = open(geojson_path,'a')
     fs.write(geojsonFooter+"\n")
     fs.close()
 
 
-        
-        
-    '''
-        cmd = ['exiftool', filepath]
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           stdin=subprocess.PIPE)
-        out, err = p.communicate('-GPSLongitude')
-        print out
-    '''
-
-    '''
-        mt = mimetypes.guess_type(filepath)[0]
-        if mt:
-            f = open(filepath, 'rb')
-            tags = exifread.process_file(f) 
-            lat,lon = get_lat_lon(tags)
-            
-            #print filepath.ljust(50),str(lat).ljust(20), str(lon).ljust(20)
-            exiftool E:\PHOTO\z_bat\geo\test1\IMG_20150228_231555.jpg"" -GPSLongitude -GPSLatitude --n  -json
-            exiftool -stay_open True -@
-            
-    '''
-        
-     #python geo3.py "E:\PHOTO\z_bat\geo\test1"
+       
