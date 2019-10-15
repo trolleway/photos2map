@@ -24,6 +24,7 @@ def get_args():
     import argparse
     p = argparse.ArgumentParser(description='Generate geojson file with location of photos in folder')
     p.add_argument('path', help='Path to folder containing JPG files')
+    p.add_argument('--o', help='path to geojson', type=str, default='photos.geojson')
     return p.parse_args()
     
 def _get_if_exist(data, key):
@@ -34,21 +35,16 @@ def _get_if_exist(data, key):
     
     
 geojsonHeader='''    
-{
-"type": "FeatureCollection",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                                                                                
-"features": [
+{"type": "FeatureCollection","crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },  "features": [
 '''
 geojsonFooter='''
-]
-}
+]}
 '''
 
 if __name__ == '__main__':
     args = get_args()
     
-    geojson_path = 'photos.geojson'
+    geojson_path = args.o
 
 
     file_list = []
